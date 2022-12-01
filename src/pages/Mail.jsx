@@ -1,5 +1,5 @@
 import { ModalMessage } from '../components/ModalMessage';
-import { IconButton, Stack, Toolbar } from '@mui/material';
+import { IconButton, Stack, Toolbar, Typography } from '@mui/material';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import { useContext, useState } from 'react';
 import { MessagesList } from '../components/MessagesList';
@@ -21,7 +21,6 @@ export const Mail = ({ setReconnect }) => {
             const username = sessionStorage.getItem('username');
 
             if (username) {
-                // setLoginedUser(username);
                 setUserName(username);
                 setReconnect(true);
             } else {
@@ -37,14 +36,16 @@ export const Mail = ({ setReconnect }) => {
                 style={{ display: 'flex', justifyContent: 'start', mb: 20 }}
             >
                 <IconButton onClick={handleOpen} variant='outlined'>
-                    <MailOutlineIcon fontSize='large' />
+                    <MailOutlineIcon color='primary' fontSize='large' />
                 </IconButton>
             </Toolbar>
 
             {messages.length ? (
                 <MessagesList messages={messages} title={'My messages'} />
             ) : (
-                'you do not have messages'
+                <Typography variant='h5' style={{ textAlign: 'center' }}>
+                    You don't have messages
+                </Typography>
             )}
 
             <ModalMessage handleClose={handleClose} open={open} />

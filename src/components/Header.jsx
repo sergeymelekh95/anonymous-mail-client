@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import { Link } from 'react-router-dom';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { GlobalContext } from '../App';
 
 export const Header = () => {
@@ -18,7 +18,12 @@ export const Header = () => {
                         component='div'
                         sx={{ flexGrow: 1 }}
                     >
-                        <Link to='/login'>Anonymous email</Link>
+                        <Link
+                            style={{ color: 'white', textDecoration: 'none' }}
+                            to='/login'
+                        >
+                            Anonymous email
+                        </Link>
                     </Typography>
                     <Typography>{loginedUser}</Typography>
                 </Toolbar>

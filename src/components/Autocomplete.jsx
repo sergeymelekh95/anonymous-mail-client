@@ -1,6 +1,4 @@
 import { Autocomplete, TextField } from '@mui/material';
-import { useContext } from 'react';
-import { GlobalContext } from '../App';
 
 export const AutocompleteSelect = ({
     setMessage,

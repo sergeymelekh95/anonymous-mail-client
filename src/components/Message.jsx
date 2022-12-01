@@ -5,6 +5,7 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { useState } from 'react';
 import { List } from '@mui/material';
+import { PreviewMessage } from './PreviewMessage';
 
 export const Message = ({ _id, senderName, sentAt, theme, text }) => {
     const [open, setOpen] = useState(false);
@@ -13,12 +14,18 @@ export const Message = ({ _id, senderName, sentAt, theme, text }) => {
         setOpen(!open);
     };
 
-    const previewMessage = `from ${senderName}; theme ${theme}`;
-
     return (
         <>
             <ListItemButton onClick={handleClick}>
-                <ListItemText primary={previewMessage} />
+                <ListItemText
+                    primary={
+                        <PreviewMessage
+                            senderName={senderName}
+                            sentAt={sentAt}
+                            theme={theme}
+                        />
+                    }
+                />
                 {open ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
             <Collapse in={open} timeout='auto' unmountOnExit>

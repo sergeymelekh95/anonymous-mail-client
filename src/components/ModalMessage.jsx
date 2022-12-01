@@ -12,7 +12,7 @@ import SendIcon from '@mui/icons-material/Send';
 import { MessagesList } from './MessagesList';
 import { GlobalContext } from '../App';
 import { useSnackbar } from 'notistack';
-import { Logo } from './Logo';
+import CloseIcon from '@mui/icons-material/Close';
 import { AutocompleteSelect } from './Autocomplete';
 
 const style = {
@@ -110,7 +110,11 @@ export const ModalMessage = ({ open, handleClose }) => {
         <Modal open={open} onClose={handleClose}>
             <Box component='div' sx={style}>
                 <Stack spacing={1}>
-                    <Logo handleClose={handleClose} />
+                    <div style={{textAlign: 'end'}}>
+                        <IconButton onClick={handleClose}>
+                            <CloseIcon fontSize='large' />
+                        </IconButton>
+                    </div>
                     <AutocompleteSelect
                         setMessage={setMessage}
                         message={message}
@@ -141,7 +145,7 @@ export const ModalMessage = ({ open, handleClose }) => {
                     />
                     <div style={{ textAlign: 'end' }}>
                         <IconButton onClick={sendMessage}>
-                            <SendIcon fontSize='large' />
+                            <SendIcon color="primary" fontSize='large' />
                         </IconButton>
                     </div>
                     {!!error && (

@@ -1,6 +1,6 @@
-import ListSubheader from '@mui/material/ListSubheader';
 import List from '@mui/material/List';
 import { Message } from './Message';
+import { Typography } from '@mui/material';
 
 export const MessagesList = ({ messages, title }) => {
     return (
@@ -11,13 +11,13 @@ export const MessagesList = ({ messages, title }) => {
                 textAlign: 'center',
             }}
             subheader={
-                <ListSubheader
-                    component='h3'
-                    variant='h3'
-                    id='nested-list-subheader'
+                <Typography
+                    component='h5'
+                    variant='h5'
+                    color='rgba(0, 0, 0, 0.7)'
                 >
                     {title}
-                </ListSubheader>
+                </Typography>
             }
         >
             {messages.map((message, index) => (

@@ -3,7 +3,7 @@ import { Box, TextField, Typography } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import { GlobalContext } from '../App';
 
-export const LoginForm = ({ loading }) => {
+export const LoginForm = ({ loadingLogin }) => {
     const {
         userName,
         connected,
@@ -75,7 +75,7 @@ export const LoginForm = ({ loading }) => {
                 variant='outlined'
             />
             <LoadingButton
-                loading={loading}
+                loading={loadingLogin}
                 onClick={handleConnect}
                 variant='contained'
             >

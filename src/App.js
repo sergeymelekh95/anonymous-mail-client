@@ -4,6 +4,7 @@ import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { LoginForm } from './pages/LoginForm';
 import { Mail } from './pages/Mail';
 import { Header } from './components/Header';
+import { Loader } from './components/Loader';
 import { NotFound } from './pages/NotFound';
 import { useSnackbar } from 'notistack';
 import { BASE_URL } from './config';
@@ -15,10 +16,11 @@ export const App = () => {
 
     const [userName, setUserName] = useState('');
     const [loginedUser, setLoginedUser] = useState('');
+    const [loading, setLoading] = useState(false);
     const [connected, setConnected] = useState(false);
     const [messages, setMessages] = useState([]);
     const [socket, setSocket] = useState(null);
-    const [loading, setLoading] = useState(false);
+    const [loadingLogin, setLoadingLogin] = useState(false);
     const [historyMsgs, setHistoryMsgs] = useState([]);
     const [reconnect, setReconnect] = useState(false);
 
@@ -27,7 +29,7 @@ export const App = () => {
     const handleUserName = (event) => setUserName(event.target.value.trim());
 
     const connect = () => {
-        setLoading(true);
+        setLoadingLogin(true);
 
         const socket = io.connect(BASE_URL);
 
@@ -38,14 +40,14 @@ export const App = () => {
 
             setLoginedUser(username);
             setMessages(msgs);
+            setLoadingLogin(false);
             setLoading(false);
             setConnected(true);
         });
 
         socket.on('newMessage', (message, callback) => {
             setMessages((prev) => [message, ...prev]);
-            enqueueSnackbar('You got a message');
-            //всунуть сюда сообщение
+            enqueueSnackbar(`FROM: ${message.senderName} MESSAGE: ${message.text}`);
         });
 
         socket.on('history', (msgs, callback) => {
@@ -61,6 +63,7 @@ export const App = () => {
 
     useEffect(() => {
         if (reconnect) {
+            setLoading(true);
             connect();
             setReconnect(false);
         }
@@ -77,17 +80,16 @@ export const App = () => {
                 setMessages,
                 socket,
                 setSocket,
-                loading,
-                setLoading,
                 historyMsgs,
                 setHistoryMsgs,
                 handleUserName,
                 connect,
                 loginedUser,
-                setLoginedUser
+                setLoginedUser,
             }}
         >
             <Header />
+            <Loader loading={loading} />
             <div
                 className='App'
                 style={{
@@ -102,7 +104,7 @@ export const App = () => {
                     ></Route>
                     <Route
                         path='/login'
-                        element={<LoginForm loading={loading} />}
+                        element={<LoginForm loadingLogin={loadingLogin} />}
                     ></Route>
                     <Route
                         path='/mail'
