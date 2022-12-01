@@ -1,7 +1,39 @@
 import LoadingButton from '@mui/lab/LoadingButton';
 import { Box, TextField, Typography } from '@mui/material';
+import { useContext, useEffect, useState } from 'react';
+import { GlobalContext } from '../App';
 
-export const ConnectForm = ({ connect, userName, handleChange, loading }) => {
+export const LoginForm = ({ loading }) => {
+    const {
+        userName,
+        connected,
+        socket,
+        setConnected,
+        handleUserName,
+        connect,
+        setLoginedUser
+    } = useContext(GlobalContext);
+
+    const [error, setError] = useState(false);
+
+    const handleConnect = () => {
+        if (userName.length > 1) {
+            connect();
+            setError(false);
+        } else {
+            setError(true);
+        }
+    };
+
+    useEffect(() => {
+        if (socket && connected) {
+            sessionStorage.removeItem('username');
+            setConnected(false);
+            setLoginedUser('');
+            socket.disconnect();
+        }
+    }, []);
+
     return (
         <Box
             component='form'
@@ -35,13 +67,18 @@ export const ConnectForm = ({ connect, userName, handleChange, loading }) => {
                 Enter you name
             </Typography>
             <TextField
+                error={error}
                 value={userName}
-                onChange={handleChange}
+                onChange={handleUserName}
                 id='userName'
                 label='username'
                 variant='outlined'
             />
-            <LoadingButton loading={loading} onClick={connect} variant='contained'>
+            <LoadingButton
+                loading={loading}
+                onClick={handleConnect}
+                variant='contained'
+            >
                 Connect
             </LoadingButton>
         </Box>

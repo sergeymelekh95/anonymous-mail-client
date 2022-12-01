@@ -1,23 +1,35 @@
-import { SendForm } from '../components/SendForm';
-import { IconButton, Stack, Toolbar, Typography } from '@mui/material';
+import { ModalMessage } from '../components/ModalMessage';
+import { IconButton, Stack, Toolbar } from '@mui/material';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { MessagesList } from '../components/MessagesList';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { GlobalContext } from '../App';
 
-export const Messenger = ({
-    connected,
-    messages,
-}) => {
+export const Mail = ({ setReconnect }) => {
+    const { messages, connected, handleUserName, setUserName } =
+        useContext(GlobalContext);
+
     const [open, setOpen] = useState(false);
     const navigate = useNavigate();
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
 
     useEffect(() => {
-        if (!connected) navigate('/connect');
-    }, [connected, navigate]);
+        if (!connected) {
+            const username = sessionStorage.getItem('username');
+
+            if (username) {
+                // setLoginedUser(username);
+                setUserName(username);
+                setReconnect(true);
+            } else {
+                navigate('/login');
+                handleUserName('');
+            }
+        }
+    }, []);
 
     return (
         <Stack spacing={10} style={{ width: '100%' }}>
@@ -26,7 +38,6 @@ export const Messenger = ({
             >
                 <IconButton onClick={handleOpen} variant='outlined'>
                     <MailOutlineIcon fontSize='large' />
-                    <Typography>Create Message</Typography>
                 </IconButton>
             </Toolbar>
 
@@ -36,10 +47,7 @@ export const Messenger = ({
                 'you do not have messages'
             )}
 
-            <SendForm
-                handleClose={handleClose}
-                open={open}
-            />
+            <ModalMessage handleClose={handleClose} open={open} />
         </Stack>
     );
 };

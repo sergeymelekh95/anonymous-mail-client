@@ -1,20 +1,19 @@
-import { useContext, useState } from 'react';
-import Box from '@mui/material/Box';
-import Modal from '@mui/material/Modal';
+import { useContext, useState, useEffect } from 'react';
 import {
-    Autocomplete,
     IconButton,
     Paper,
     Stack,
     TextField,
+    Box,
+    Modal,
+    Link,
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
-import CloseIcon from '@mui/icons-material/Close';
-import { useEffect } from 'react';
-import Link from '@mui/material/Link';
 import { MessagesList } from './MessagesList';
 import { GlobalContext } from '../App';
 import { useSnackbar } from 'notistack';
+import { Logo } from './Logo';
+import { AutocompleteSelect } from './Autocomplete';
 
 const style = {
     position: 'absolute',
@@ -35,14 +34,15 @@ const initialData = {
     receiverName: null,
 };
 
-export const SendForm = ({ open, handleClose }) => {
-    const { setHistoryMsgs, historyMsgs, registeredUsers, socket, userName } =
+export const ModalMessage = ({ open, handleClose }) => {
+    const { setHistoryMsgs, historyMsgs, socket, userName } =
         useContext(GlobalContext);
 
     const [message, setMessage] = useState(initialData);
     const [sentMessage, setSentMessage] = useState(false);
     const [showHistoryMessages, setShowHistoryMessages] = useState(false);
-    const [valid, setValid] = useState(false);
+    const [error, setError] = useState(false);
+    const [registeredUsers, setRegisteredUsers] = useState([]);
 
     const { enqueueSnackbar } = useSnackbar();
 
@@ -53,14 +53,6 @@ export const SendForm = ({ open, handleClose }) => {
         setShowHistoryMessages(false);
         setHistoryMsgs([]);
         setSentMessage(false);
-
-        const { theme, text, senderName, receiverName } = message;
-
-        if (theme && text && senderName && receiverName) {
-            setValid(true);
-        } else {
-            setValid(false);
-        }
     };
 
     const getHistoryMessages = () => {
@@ -71,19 +63,42 @@ export const SendForm = ({ open, handleClose }) => {
         setShowHistoryMessages(!showHistoryMessages);
     };
 
-    const sendMessage = async () => {
-        socket.emit('message', message);
+    const sendMessage = async (e) => {
+        if (
+            registeredUsers.find(
+                (registeredUser) =>
+                    registeredUser.username === message.receiverName
+            )
+        ) {
+            socket.emit('message', message);
 
-        enqueueSnackbar('Message sent successfully', { variant: 'success' });
+            enqueueSnackbar('Message sent successfully', {
+                variant: 'success',
+            });
 
-        //clear form
-        setMessage({...message, theme: '', text: '' });
-        setSentMessage(true);
-        setShowHistoryMessages(false);
-        setValid(false);
+            setMessage({ ...message, theme: '', text: '' });
+            setSentMessage(true);
+            setShowHistoryMessages(false);
+            setError(false);
+        } else {
+            setError(true);
+        }
     };
 
-    useEffect(() => setMessage({ ...message, senderName: userName }), []);
+    const onFocus = () => {
+        socket.emit('users', '', (users) => {
+            setRegisteredUsers(users);
+        });
+    };
+
+    useEffect(
+        () =>
+            setMessage({
+                ...message,
+                senderName: userName || sessionStorage.getItem('username'),
+            }),
+        []
+    );
 
     useEffect(() => {
         if (!open) setSentMessage(false);
@@ -94,29 +109,16 @@ export const SendForm = ({ open, handleClose }) => {
     return (
         <Modal open={open} onClose={handleClose}>
             <Box component='div' sx={style}>
-                <Stack spacing={3}>
-                    <div style={{ textAlign: 'end' }}>
-                        <IconButton onClick={handleClose}>
-                            <CloseIcon fontSize='large' />
-                        </IconButton>
-                    </div>
-                    <Autocomplete
-                        id='receiverName'
-                        freeSolo
-                        onChange={(event, value) => {
-                            setMessage({ ...message, receiverName: value });
-                            setSentMessage(false);
-                        }}
-                        options={registeredUsers.map(
-                            (option) => option.username
-                        )}
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                name='receiverName'
-                                label='Receiver'
-                            />
-                        )}
+                <Stack spacing={1}>
+                    <Logo handleClose={handleClose} />
+                    <AutocompleteSelect
+                        setMessage={setMessage}
+                        message={message}
+                        setSentMessage={setSentMessage}
+                        registeredUsers={registeredUsers}
+                        onFocus={onFocus}
+                        error={error}
+                        handleChange={handleChange}
                     />
                     <TextField
                         label='Theme'
@@ -138,10 +140,13 @@ export const SendForm = ({ open, handleClose }) => {
                         variant='outlined'
                     />
                     <div style={{ textAlign: 'end' }}>
-                        <IconButton disabled={!valid} onClick={sendMessage}>
+                        <IconButton onClick={sendMessage}>
                             <SendIcon fontSize='large' />
                         </IconButton>
                     </div>
+                    {!!error && (
+                        <p style={{ color: 'red' }}>Error, user in not found</p>
+                    )}
                     {!!sentMessage && (
                         <Link component='button' onClick={getHistoryMessages}>
                             {showHistoryMessages ? 'Hide' : 'Show'} all messages

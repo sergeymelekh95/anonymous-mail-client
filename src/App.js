@@ -1,8 +1,8 @@
 import io from 'socket.io-client';
 import { createContext, useEffect, useState } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import { ConnectForm } from './pages/ConnectForm';
-import { Messenger } from './pages/Messenger';
+import { LoginForm } from './pages/LoginForm';
+import { Mail } from './pages/Mail';
 import { Header } from './components/Header';
 import { NotFound } from './pages/NotFound';
 import { useSnackbar } from 'notistack';
@@ -13,30 +13,31 @@ export const GlobalContext = createContext();
 export const App = () => {
     const navigate = useNavigate();
 
-    const [connectedUser, setConnectedUser] = useState('');
     const [userName, setUserName] = useState('');
+    const [loginedUser, setLoginedUser] = useState('');
     const [connected, setConnected] = useState(false);
     const [messages, setMessages] = useState([]);
     const [socket, setSocket] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [registeredUsers, setRegsisteredUsers] = useState([]);
     const [historyMsgs, setHistoryMsgs] = useState([]);
+    const [reconnect, setReconnect] = useState(false);
 
     const { enqueueSnackbar } = useSnackbar();
 
-    const handleChange = (event) => setUserName(event.target.value);
+    const handleUserName = (event) => setUserName(event.target.value.trim());
 
-    const connect = (event) => {
+    const connect = () => {
         setLoading(true);
 
         const socket = io.connect(BASE_URL);
 
         setSocket(socket);
 
-        socket.emit('login', userName, ({ username, users, msgs }) => {
+        socket.emit('login', userName, ({ username, msgs }) => {
+            sessionStorage.setItem('username', username);
+
+            setLoginedUser(username);
             setMessages(msgs);
-            setConnectedUser(username);
-            setRegsisteredUsers(users);
             setLoading(false);
             setConnected(true);
         });
@@ -44,6 +45,7 @@ export const App = () => {
         socket.on('newMessage', (message, callback) => {
             setMessages((prev) => [message, ...prev]);
             enqueueSnackbar('You got a message');
+            //всунуть сюда сообщение
         });
 
         socket.on('history', (msgs, callback) => {
@@ -52,18 +54,21 @@ export const App = () => {
     };
 
     useEffect(() => {
-        if (connected) {
-            navigate('/messenger');
-        }
-    }, [connected, navigate]);
+        if (connected) navigate('/mail');
+    }, [connected]);
 
     useEffect(() => {}, [messages]);
+
+    useEffect(() => {
+        if (reconnect) {
+            connect();
+            setReconnect(false);
+        }
+    }, [reconnect]);
 
     return (
         <GlobalContext.Provider
             value={{
-                connectedUser,
-                setConnectedUser,
                 userName,
                 setUserName,
                 connected,
@@ -74,13 +79,15 @@ export const App = () => {
                 setSocket,
                 loading,
                 setLoading,
-                registeredUsers,
-                setRegsisteredUsers,
                 historyMsgs,
                 setHistoryMsgs,
+                handleUserName,
+                connect,
+                loginedUser,
+                setLoginedUser
             }}
         >
-            <Header connectedUser={connectedUser} />
+            <Header />
             <div
                 className='App'
                 style={{
@@ -91,27 +98,15 @@ export const App = () => {
                 <Routes>
                     <Route
                         path='/'
-                        element={<Navigate to={'/connect'} />}
+                        element={<Navigate to={'/login'} />}
                     ></Route>
                     <Route
-                        path='/connect'
-                        element={
-                            <ConnectForm
-                                handleChange={handleChange}
-                                userName={userName}
-                                connect={connect}
-                                loading={loading}
-                            />
-                        }
+                        path='/login'
+                        element={<LoginForm loading={loading} />}
                     ></Route>
                     <Route
-                        path='/messenger'
-                        element={
-                            <Messenger
-                                messages={messages}
-                                connected={connected}
-                            />
-                        }
+                        path='/mail'
+                        element={<Mail setReconnect={setReconnect} />}
                     ></Route>
                     <Route path='*' element={<NotFound />}></Route>
                 </Routes>
