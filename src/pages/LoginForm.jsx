@@ -63,15 +63,15 @@ export const LoginForm = ({ loadingLogin }) => {
                     autoComplete='off'
                 >
                     <Typography
-                        variant='h3'
-                        component='h3'
+                        variant='h6'
+                        component='h6'
                         textAlign='center'
                         style={{ marginBottom: 20 }}
                     >
-                        Hi
+                        Welcome!
                     </Typography>
                     <Typography style={{ textAlign: 'center' }} component='p'>
-                        Enter you name
+                        Please, enter you name
                     </Typography>
                     <TextField
                         error={error}
