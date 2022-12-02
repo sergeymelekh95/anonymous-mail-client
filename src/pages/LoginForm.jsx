@@ -1,5 +1,5 @@
 import LoadingButton from '@mui/lab/LoadingButton';
-import { Box, TextField, Typography } from '@mui/material';
+import { Box, Grid, TextField, Typography } from '@mui/material';
 import { useContext, useEffect, useState } from 'react';
 import { GlobalContext } from '../App';
 
@@ -11,7 +11,7 @@ export const LoginForm = ({ loadingLogin }) => {
         setConnected,
         handleUserName,
         connect,
-        setLoginedUser
+        setLoginedUser,
     } = useContext(GlobalContext);
 
     const [error, setError] = useState(false);
@@ -35,52 +35,61 @@ export const LoginForm = ({ loadingLogin }) => {
     }, []);
 
     return (
-        <Box
-            component='form'
-            sx={{
-                '& > :not(style)': { m: 1, width: '25ch' },
-            }}
-            style={{
-                padding: 20,
-                marginTop: 200,
-                maxWidth: 500,
-                border: '1px solid rgb(203 203 203)',
-                boxShadow: '9px 8px 19px 0px rgba(0,0,0,0.58)',
-                borderRadius: 15,
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-            }}
-            noValidate
-            autoComplete='off'
+        <Grid
+            container
+            spacing={0}
+            direction='column'
+            alignItems='center'
+            justifyContent='center'
+            style={{ minHeight: '90vh' }}
         >
-            <Typography
-                variant='h3'
-                component='h3'
-                textAlign='center'
-                style={{ marginBottom: 50 }}
-            >
-                Hi
-            </Typography>
-            <Typography style={{ textAlign: 'center' }} component='p'>
-                Enter you name
-            </Typography>
-            <TextField
-                error={error}
-                value={userName}
-                onChange={handleUserName}
-                id='userName'
-                label='username'
-                variant='outlined'
-            />
-            <LoadingButton
-                loading={loadingLogin}
-                onClick={handleConnect}
-                variant='contained'
-            >
-                Connect
-            </LoadingButton>
-        </Box>
+            <Grid item xs={3}>
+                <Box
+                    component='form'
+                    sx={{
+                        '& > :not(style)': { m: 1, width: '25ch' },
+                    }}
+                    style={{
+                        padding: 20,
+                        maxWidth: 500,
+                        border: '1px solid rgb(203 203 203)',
+                        boxShadow: '9px 8px 19px 0px rgba(0,0,0,0.58)',
+                        borderRadius: 15,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                    }}
+                    noValidate
+                    autoComplete='off'
+                >
+                    <Typography
+                        variant='h3'
+                        component='h3'
+                        textAlign='center'
+                        style={{ marginBottom: 20 }}
+                    >
+                        Hi
+                    </Typography>
+                    <Typography style={{ textAlign: 'center' }} component='p'>
+                        Enter you name
+                    </Typography>
+                    <TextField
+                        error={error}
+                        value={userName}
+                        onChange={handleUserName}
+                        id='userName'
+                        label='username'
+                        variant='outlined'
+                    />
+                    <LoadingButton
+                        loading={loadingLogin}
+                        onClick={handleConnect}
+                        variant='contained'
+                    >
+                        Connect
+                    </LoadingButton>
+                </Box>
+            </Grid>
+        </Grid>
     );
 };
