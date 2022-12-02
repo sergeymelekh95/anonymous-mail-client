@@ -112,7 +112,7 @@ export const ModalMessage = ({ open, handleClose }) => {
                 <Stack spacing={1}>
                     <div style={{textAlign: 'end'}}>
                         <IconButton onClick={handleClose}>
-                            <CloseIcon fontSize='large' />
+                            <CloseIcon fontSize='medium' />
                         </IconButton>
                     </div>
                     <AutocompleteSelect
@@ -126,6 +126,7 @@ export const ModalMessage = ({ open, handleClose }) => {
                     />
                     <TextField
                         label='Theme'
+                        size="small"
                         fullWidth
                         onChange={handleChange}
                         value={message.theme}
@@ -135,17 +136,18 @@ export const ModalMessage = ({ open, handleClose }) => {
                     />
                     <TextField
                         id='text'
+                        size="small"
                         label='text'
                         onChange={handleChange}
                         value={message.text}
                         name='text'
                         multiline
-                        rows={7}
+                        rows={5}
                         variant='outlined'
                     />
                     <div style={{ textAlign: 'end' }}>
                         <IconButton onClick={sendMessage}>
-                            <SendIcon color="primary" fontSize='large' />
+                            <SendIcon color="primary" fontSize='medium' />
                         </IconButton>
                     </div>
                     {!!error && (
@@ -158,7 +160,7 @@ export const ModalMessage = ({ open, handleClose }) => {
                         </Link>
                     )}
                     {!!showHistoryMessages && (
-                        <Paper style={{ maxHeight: 300, overflow: 'auto' }}>
+                        <Paper style={{ maxHeight: 200, overflow: 'auto' }}>
                             <MessagesList
                                 messages={historyMsgs}
                                 title='Sent messages'

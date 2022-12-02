@@ -18,6 +18,7 @@ export const AutocompleteSelect = ({
                 setMessage({ ...message, receiverName: value });
                 setSentMessage(false);
             }}
+            size="small"
             options={registeredUsers.map((option) => option.username)}
             renderInput={(params) => (
                 <TextField
